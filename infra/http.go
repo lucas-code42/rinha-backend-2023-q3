@@ -2,14 +2,31 @@ package infra
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/lucas-code42/rinha-backend/infra/handler"
+	"github.com/lucas-code42/rinha-backend/internal/application"
 )
 
-func StartHttpServer(e *echo.Echo) {
-	e.POST("/pessoas", handler.CreatePerson)
-	e.GET("/pessoas/:id", handler.GetPersonById)
-	e.GET("/pessoas", handler.SearchPerson)
-	e.GET("/contagem-pessoas", handler.CountPeople)
+type HttpServer struct {
+	echoEngine *echo.Echo
+	repository application.RespositoryImpl
+}
 
-	e.Logger.Fatal(e.Start(":1323"))
+func New(
+	echoEngine *echo.Echo,
+	repository application.RespositoryImpl,
+) *HttpServer {
+	return &HttpServer{
+		echoEngine: echoEngine,
+		repository: repository,
+	}
+}
+
+func (h *HttpServer) StartHttpServer() {
+	httpController := NewController(h.repository)
+
+	h.echoEngine.POST("/pessoas", httpController.CreatePerson())
+	// h.echoEngine.GET("/pessoas/:id", httpController.GetPersonById())
+	// h.echoEngine.GET("/pessoas", httpController.SearchPerson)
+	// h.echoEngine.GET("/contagem-pessoas", httpController.CountPeople)
+
+	h.echoEngine.Logger.Fatal(h.echoEngine.Start(":8080"))
 }
