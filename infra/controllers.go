@@ -9,7 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/lucas-code42/rinha-backend/internal/application"
-	"github.com/lucas-code42/rinha-backend/internal/application/usecase/create"
+	"github.com/lucas-code42/rinha-backend/internal/application/usecase/createperson"
+	"github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid"
 	"github.com/lucas-code42/rinha-backend/internal/domain"
 )
 
@@ -23,6 +24,7 @@ func NewController(respository application.RespositoryImpl) *HttpController {
 	}
 }
 
+// validar campos de entrada...
 func (h *HttpController) CreatePerson() func(echo.Context) error {
 	return func(c echo.Context) error {
 		var payload domain.Pessoa
@@ -40,8 +42,9 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 			Stack:      strings.Join(payload.Stack, ";"),
 		}
 
-		usecase := create.New(payloadDto, h.respository)
+		usecase := createperson.New(payloadDto, h.respository)
 		if err := usecase.Execute(); err != nil {
+			slog.Error("error usecase CreatePerson", err)
 			return c.JSON(http.StatusUnprocessableEntity, map[string]int{"error": http.StatusUnprocessableEntity})
 		}
 
@@ -50,13 +53,25 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 	}
 }
 
-// func CreatePerson(c echo.Context) error {
-// 	return c.String(http.StatusInternalServerError, "CreatePerson - NOT IMPLEMENTED!!")
-// }
+func (h *HttpController) GetPersonById() func(echo.Context) error {
+	return func(c echo.Context) error {
+		personId := c.Param("id")
+		if personId == "" {
+			slog.Error("error path param is empty")
+			return c.JSON(http.StatusBadRequest, map[string]int{"error": http.StatusBadRequest})
+		}
 
-// func GetPersonById(c echo.Context) error {
-// 	return c.String(http.StatusInternalServerError, "GetPersonById - NOT IMPLEMENTED!!")
-// }
+		getUc := getpersonbyid.New(h.respository)
+		person, err := getUc.Execute(personId)
+		if err != nil {
+			slog.Error("error usecase GetPersonById", err)
+			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
+		}
+
+		return c.JSON(http.StatusInternalServerError, person)
+	}
+
+}
 
 // func SearchPerson(c echo.Context) error {
 // 	return c.String(http.StatusInternalServerError, "SearchPerson - NOT IMPLEMENTED!!")

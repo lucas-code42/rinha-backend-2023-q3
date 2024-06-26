@@ -1,4 +1,4 @@
-package create
+package createperson
 
 import (
 	"github.com/lucas-code42/rinha-backend/internal/application"
