@@ -8,19 +8,19 @@ import (
 	"github.com/lucas-code42/rinha-backend/internal/domain"
 )
 
-type CreateUseCase struct {
+type GetPersonById struct {
 	repository application.RespositoryImpl
 }
 
 func New(
 	repository application.RespositoryImpl,
-) *CreateUseCase {
-	return &CreateUseCase{
+) *GetPersonById {
+	return &GetPersonById{
 		repository: repository,
 	}
 }
 
-func (c *CreateUseCase) Execute(personId string) (*domain.Pessoa, error) {
+func (c *GetPersonById) Execute(personId string) (*domain.Pessoa, error) {
 	personDto, err := c.repository.GetPersonById(personId)
 	if err != nil {
 		slog.Error("error usecase", err)

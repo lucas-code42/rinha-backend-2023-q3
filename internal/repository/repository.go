@@ -69,3 +69,38 @@ func (p *PersonRepository) GetPersonById(personId string) (*domain.PessoaDto, er
 
 	return &personDto, nil
 }
+
+func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto, error) {
+	stmt, err := p.sqlClient.Prepare(`
+		SELECT * FROM pessoa WHERE apelido LIKE ? OR nome LIKE ? OR stack LIKE ?
+	`)
+	if err != nil {
+		slog.Error("error query search person by term", err)
+		return []*domain.PessoaDto{}, err
+	}
+
+	rows, err := stmt.Query("%"+searchTerm+"%", "%"+searchTerm+"%", "%"+searchTerm+"%")
+	if err != nil {
+		slog.Error("error to exec query search person by term", err)
+		return []*domain.PessoaDto{}, err
+	}
+
+	var paginationPerson []*domain.PessoaDto
+	for rows.Next() {
+		var person domain.PessoaDto
+		if err := rows.Scan(
+			&person.Id,
+			&person.Apelido,
+			&person.Nome,
+			&person.Nascimento,
+			&person.Stack,
+		); err != nil {
+			slog.Error("error scan query rows", err)
+			return []*domain.PessoaDto{}, err
+		}
+
+		paginationPerson = append(paginationPerson, &person)
+	}
+
+	return paginationPerson, nil
+}

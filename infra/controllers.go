@@ -11,6 +11,7 @@ import (
 	"github.com/lucas-code42/rinha-backend/internal/application"
 	"github.com/lucas-code42/rinha-backend/internal/application/usecase/createperson"
 	"github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid"
+	"github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson"
 	"github.com/lucas-code42/rinha-backend/internal/domain"
 )
 
@@ -71,6 +72,25 @@ func (h *HttpController) GetPersonById() func(echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, person)
 	}
 
+}
+
+func (h *HttpController) SearchPerson() func(echo.Context) error {
+	return func(c echo.Context) error {
+		searchTerm := c.QueryParam("t")
+		if searchTerm == "" {
+			slog.Error("error query param is empty")
+			return c.JSON(http.StatusBadRequest, map[string]int{"error": http.StatusBadRequest})
+		}
+
+		searchPersonUc := searchperson.New(h.respository)
+		pagination, err := searchPersonUc.Execute(searchTerm)
+		if err != nil {
+			slog.Error("error usecase SearchPerson", err)
+			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
+		}
+
+		return c.JSON(http.StatusOK, pagination)
+	}
 }
 
 // func SearchPerson(c echo.Context) error {
