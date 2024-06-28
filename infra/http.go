@@ -26,7 +26,7 @@ func (h *HttpServer) StartHttpServer() {
 	h.echoEngine.POST("/pessoas", httpController.CreatePerson())
 	h.echoEngine.GET("/pessoas/:id", httpController.GetPersonById())
 	h.echoEngine.GET("/pessoas", httpController.SearchPerson())
-	// h.echoEngine.GET("/contagem-pessoas", httpController.CountPeople)
+	h.echoEngine.GET("/contagem-pessoas", httpController.CountPeople())
 
 	h.echoEngine.Logger.Fatal(h.echoEngine.Start(":8080"))
 }

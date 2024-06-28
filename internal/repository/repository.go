@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
 
 	"github.com/lucas-code42/rinha-backend/internal/domain"
@@ -103,4 +104,20 @@ func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto,
 	}
 
 	return paginationPerson, nil
+}
+
+func (p *PersonRepository) Count() (int, error) {
+	var total int
+	if err := p.sqlClient.QueryRow("SELECT COUNT(id) FROM pessoa").Scan(&total); err != nil {
+		slog.Error("error cannot count id from data base", err)
+		return 0, err
+	}
+
+	if total <= 0 {
+		e := fmt.Errorf("count db error")
+		slog.Error("error data base has no data to count", e)
+		return 0, e
+	}
+
+	return total, nil
 }

@@ -6,4 +6,5 @@ type RespositoryImpl interface {
 	CreatePerson(person *domain.PessoaDto) error
 	GetPersonById(personId string) (*domain.PessoaDto, error)
 	SearchPerson(searchTerm string) ([]*domain.PessoaDto, error)
+	Count() (int, error)
 }

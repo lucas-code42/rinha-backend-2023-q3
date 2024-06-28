@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/lucas-code42/rinha-backend/internal/application"
+	"github.com/lucas-code42/rinha-backend/internal/application/usecase/countpeople"
 	"github.com/lucas-code42/rinha-backend/internal/application/usecase/createperson"
 	"github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid"
 	"github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson"
@@ -50,7 +51,7 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 		}
 
 		c.Response().Header().Add("Location", fmt.Sprintf("/pessoas/%s", uuid))
-		return c.JSONBlob(http.StatusCreated, []byte(""))
+		return c.JSONBlob(http.StatusCreated, nil)
 	}
 }
 
@@ -69,7 +70,7 @@ func (h *HttpController) GetPersonById() func(echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
 		}
 
-		return c.JSON(http.StatusInternalServerError, person)
+		return c.JSON(http.StatusOK, person)
 	}
 
 }
@@ -93,10 +94,15 @@ func (h *HttpController) SearchPerson() func(echo.Context) error {
 	}
 }
 
-// func SearchPerson(c echo.Context) error {
-// 	return c.String(http.StatusInternalServerError, "SearchPerson - NOT IMPLEMENTED!!")
-// }
+func (h *HttpController) CountPeople() func(echo.Context) error {
+	return func(c echo.Context) error {
+		countUc := countpeople.New(h.respository)
+		total, err := countUc.Execute()
+		if err != nil {
+			slog.Error("error usecase CountPeople")
+			return c.JSONBlob(http.StatusInternalServerError, nil)
+		}
 
-// func CountPeople(c echo.Context) error {
-// 	return c.String(http.StatusInternalServerError, "CountPeople - NOT IMPLEMENTED!!")
-// }
+		return c.JSON(http.StatusOK, map[string]int{"totalRecords": total})
+	}
+}
