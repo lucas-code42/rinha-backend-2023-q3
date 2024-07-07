@@ -26,7 +26,6 @@ func NewController(respository application.RespositoryImpl) *HttpController {
 	}
 }
 
-// validar campos de entrada...
 func (h *HttpController) CreatePerson() func(echo.Context) error {
 	return func(c echo.Context) error {
 		var payload domain.Pessoa
