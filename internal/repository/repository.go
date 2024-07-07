@@ -19,12 +19,12 @@ func New(sqlClient *sql.DB) *PersonRepository {
 func (p *PersonRepository) CreatePerson(person *domain.PessoaDto) error {
 	stmt, err := p.sqlClient.Prepare("INSERT INTO pessoa(id, apelido, nome, nascimento, stack) values (?, ?, ?, ? , ?)")
 	if err != nil {
-		slog.Error("error preapare statement", err)
+		slog.Error("error preapare statement", err.Error(), err)
 		return err
 	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
-			slog.Error("error statement close", err)
+			slog.Error("error statement close", err.Error(), err)
 		}
 	}()
 
@@ -36,13 +36,13 @@ func (p *PersonRepository) CreatePerson(person *domain.PessoaDto) error {
 		person.Stack,
 	)
 	if err != nil {
-		slog.Error("error statement execute", err)
+		slog.Error("error statement execute", err.Error(), err)
 		return err
 	}
 
 	n, err := response.RowsAffected()
 	if n != 1 || err != nil {
-		slog.Error("error rows affected", err)
+		slog.Error("error rows affected", err.Error(), err)
 		return err
 	}
 
@@ -52,7 +52,7 @@ func (p *PersonRepository) CreatePerson(person *domain.PessoaDto) error {
 func (p *PersonRepository) GetPersonById(personId string) (*domain.PessoaDto, error) {
 	stmt, err := p.sqlClient.Prepare("SELECT * FROM pessoa WHERE id=?")
 	if err != nil {
-		slog.Error("error query get person by id", err)
+		slog.Error("error query get person by id", err.Error(), err)
 		return &domain.PessoaDto{}, err
 	}
 
@@ -64,26 +64,25 @@ func (p *PersonRepository) GetPersonById(personId string) (*domain.PessoaDto, er
 		&personDto.Nascimento,
 		&personDto.Stack,
 	); err != nil {
-		slog.Error("error scan query row", err)
+		slog.Error("error scan query row", err.Error(), err)
 		return &domain.PessoaDto{}, err
 	}
 
 	return &personDto, nil
 }
 
-// TODO: create a real pagination
 func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto, error) {
 	stmt, err := p.sqlClient.Prepare(`
-		SELECT * FROM pessoa WHERE apelido LIKE ? OR nome LIKE ? OR stack LIKE ?
+		SELECT * FROM pessoa WHERE apelido LIKE ? OR nome LIKE ? OR stack LIKE ? LIMIT 50
 	`)
 	if err != nil {
-		slog.Error("error query search person by term", err)
+		slog.Error("error query search person by term", err.Error(), err)
 		return []*domain.PessoaDto{}, err
 	}
 
 	rows, err := stmt.Query("%"+searchTerm+"%", "%"+searchTerm+"%", "%"+searchTerm+"%")
 	if err != nil {
-		slog.Error("error to exec query search person by term", err)
+		slog.Error("error to exec query search person by term", err.Error(), err)
 		return []*domain.PessoaDto{}, err
 	}
 
@@ -97,27 +96,26 @@ func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto,
 			&person.Nascimento,
 			&person.Stack,
 		); err != nil {
-			slog.Error("error scan query rows", err)
+			slog.Error("error scan query rows", err.Error(), err)
 			return []*domain.PessoaDto{}, err
 		}
 
 		paginationPerson = append(paginationPerson, &person)
 	}
 
-	// TODO: If paginationPerson is empty?
 	return paginationPerson, nil
 }
 
 func (p *PersonRepository) Count() (int, error) {
 	var total int
 	if err := p.sqlClient.QueryRow("SELECT COUNT(id) FROM pessoa").Scan(&total); err != nil {
-		slog.Error("error cannot count id from data base", err)
+		slog.Error("error cannot count id from data base", err.Error(), err)
 		return 0, err
 	}
 
 	if total <= 0 {
 		e := fmt.Errorf("count db error")
-		slog.Error("error data base has no data to count", e)
+		slog.Error("error data base has no data to count", e.Error(), e)
 		return 0, e
 	}
 

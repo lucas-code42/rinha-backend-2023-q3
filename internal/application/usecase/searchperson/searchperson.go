@@ -20,17 +20,15 @@ func New(
 	}
 }
 
-// TODO: create a real pagination
 func (c *SearchPerson) Execute(searchTerm string) ([]*domain.Pessoa, error) {
 	personDto, err := c.repository.SearchPerson(searchTerm)
 	if err != nil {
-		slog.Error("term not found", err)
+		slog.Error("term not found", err.Error(), err)
 		return []*domain.Pessoa{}, err
 	}
 
-	// TODO: maybe a little improvement here
 	if len(personDto) == 0 {
-		slog.Error("term len = 0", err)
+		slog.Warn("the term result list is empty")
 		return []*domain.Pessoa{}, nil
 	}
 

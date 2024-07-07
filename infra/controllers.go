@@ -31,7 +31,7 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 	return func(c echo.Context) error {
 		var payload domain.Pessoa
 		if err := c.Bind(&payload); err != nil {
-			slog.Error("error payload unprocessable entity", err)
+			slog.Error("error payload unprocessable entity", err.Error(), err)
 			return c.JSON(http.StatusUnprocessableEntity, map[string]int{"error": http.StatusUnprocessableEntity})
 		}
 
@@ -46,7 +46,7 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 
 		usecase := createperson.New(payloadDto, h.respository)
 		if err := usecase.Execute(); err != nil {
-			slog.Error("error usecase CreatePerson", err)
+			slog.Error("error usecase CreatePerson", err.Error(), err)
 			return c.JSON(http.StatusUnprocessableEntity, map[string]int{"error": http.StatusUnprocessableEntity})
 		}
 
@@ -66,7 +66,7 @@ func (h *HttpController) GetPersonById() func(echo.Context) error {
 		getUc := getpersonbyid.New(h.respository)
 		person, err := getUc.Execute(personId)
 		if err != nil {
-			slog.Error("error usecase GetPersonById", err)
+			slog.Error("error usecase GetPersonById", err.Error(), err)
 			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
 		}
 
@@ -86,7 +86,7 @@ func (h *HttpController) SearchPerson() func(echo.Context) error {
 		searchPersonUc := searchperson.New(h.respository)
 		pagination, err := searchPersonUc.Execute(searchTerm)
 		if err != nil {
-			slog.Error("error usecase SearchPerson", err)
+			slog.Error("error usecase SearchPerson", err.Error(), err)
 			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
 		}
 
