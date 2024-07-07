@@ -23,7 +23,7 @@ func New(
 func (c *GetPersonById) Execute(personId string) (*domain.Pessoa, error) {
 	personDto, err := c.repository.GetPersonById(personId)
 	if err != nil {
-		slog.Error("error usecase", err)
+		slog.Error("error person not found", err)
 		return &domain.Pessoa{}, err
 	}
 
