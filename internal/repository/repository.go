@@ -71,6 +71,7 @@ func (p *PersonRepository) GetPersonById(personId string) (*domain.PessoaDto, er
 	return &personDto, nil
 }
 
+// TODO: create a real pagination
 func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto, error) {
 	stmt, err := p.sqlClient.Prepare(`
 		SELECT * FROM pessoa WHERE apelido LIKE ? OR nome LIKE ? OR stack LIKE ?
@@ -103,6 +104,7 @@ func (p *PersonRepository) SearchPerson(searchTerm string) ([]*domain.PessoaDto,
 		paginationPerson = append(paginationPerson, &person)
 	}
 
+	// TODO: If paginationPerson is empty?
 	return paginationPerson, nil
 }
 

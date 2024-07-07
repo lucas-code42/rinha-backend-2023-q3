@@ -20,15 +20,17 @@ func New(
 	}
 }
 
+// TODO: create a real pagination
 func (c *SearchPerson) Execute(searchTerm string) ([]*domain.Pessoa, error) {
 	personDto, err := c.repository.SearchPerson(searchTerm)
 	if err != nil {
-		slog.Error("error usecase", err)
+		slog.Error("term not found", err)
 		return []*domain.Pessoa{}, err
 	}
 
+	// TODO: maybe a little improvement here
 	if len(personDto) == 0 {
-		slog.Error("error usecase", err)
+		slog.Error("term len = 0", err)
 		return []*domain.Pessoa{}, nil
 	}
 
