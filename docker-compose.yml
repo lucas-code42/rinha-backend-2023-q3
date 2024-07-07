@@ -5,8 +5,6 @@ services:
     build:
       context: ./
       dockerfile: dockerfile
-    depends_on:
-      - db
     expose:
       - "80"
     deploy:
@@ -14,6 +12,9 @@ services:
         limits:
           cpus: "0.25"
           memory: "0.5GB"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - rinhaBackend
 
@@ -23,8 +24,6 @@ services:
     build:
       context: ./
       dockerfile: dockerfile
-    depends_on:
-      - db
     expose:
       - "80"
     deploy:
@@ -32,6 +31,9 @@ services:
         limits:
           cpus: "0.25"
           memory: "0.5GB"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - rinhaBackend
 
@@ -67,6 +69,11 @@ services:
         limits:
           cpus: "0.75"
           memory: "1.5GB"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
     networks:
       - rinhaBackend
 

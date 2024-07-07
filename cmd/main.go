@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/labstack/echo/v4"
 	"github.com/lucas-code42/rinha-backend/infra"
 	"github.com/lucas-code42/rinha-backend/internal/configs"
@@ -12,10 +9,6 @@ import (
 )
 
 func main() {
-	// TODO: fix this in docker-compose!!!
-	time.Sleep(20 * time.Second)
-	fmt.Println("START NOW!!")
-
 	configs.Init()
 	db := sql.New()
 	repo := repository.New(db.SqlClient)
