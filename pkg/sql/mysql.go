@@ -17,7 +17,7 @@ func New() *sqlDb {
 		User:   os.Getenv("DBUser"),
 		Passwd: os.Getenv("DBPassword"),
 		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
+		Addr:   "db:3306",
 		DBName: os.Getenv("DBName"),
 	}
 

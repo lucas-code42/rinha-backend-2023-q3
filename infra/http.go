@@ -23,10 +23,14 @@ func New(
 func (h *HttpServer) StartHttpServer() {
 	httpController := NewController(h.repository)
 
+	h.echoEngine.GET("/live", func(c echo.Context) error {
+		return c.JSON(200, "OK")
+	})
+
 	h.echoEngine.POST("/pessoas", httpController.CreatePerson())
 	h.echoEngine.GET("/pessoas/:id", httpController.GetPersonById())
 	h.echoEngine.GET("/pessoas", httpController.SearchPerson())
 	h.echoEngine.GET("/contagem-pessoas", httpController.CountPeople())
 
-	h.echoEngine.Logger.Fatal(h.echoEngine.Start(":8080"))
+	h.echoEngine.Logger.Fatal(h.echoEngine.Start(":80"))
 }
