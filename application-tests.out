@@ -1,0 +1,18 @@
+mode: set
+github.com/lucas-code42/rinha-backend/internal/application/usecase/createperson/createperson.go:16.18,21.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/createperson/createperson.go:23.41,25.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/countpeople/countpeople.go:13.16,17.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/countpeople/countpeople.go:19.46,21.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid/getperson.go:17.18,21.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid/getperson.go:23.74,25.16 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid/getperson.go:25.16,28.3 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/getpersonbyid/getperson.go:30.2,36.8 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:17.17,21.2 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:23.77,25.16 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:25.16,28.3 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:30.2,30.25 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:30.25,33.3 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:35.2,35.35 1 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:38.75,40.24 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:40.24,49.3 2 1
+github.com/lucas-code42/rinha-backend/internal/application/usecase/searchperson/searchperson.go:51.2,51.15 1 1

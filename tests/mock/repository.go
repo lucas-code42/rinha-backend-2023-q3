@@ -3,9 +3,9 @@ package mock
 import "github.com/lucas-code42/rinha-backend/internal/domain"
 
 type MockRepository struct {
-	CreatePersonFunc  func(*domain.PessoaDto) error
-	GetPersonByIdFunc func(string) (*domain.PessoaDto, error)
-	SearchPersonFunc  func(string) ([]*domain.PessoaDto, error)
+	CreatePersonFunc  func(pd *domain.PessoaDto) error
+	GetPersonByIdFunc func(s string) (*domain.PessoaDto, error)
+	SearchPersonFunc  func(s string) ([]*domain.PessoaDto, error)
 	CountFunc         func() (int, error)
 }
 
