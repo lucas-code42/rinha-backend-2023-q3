@@ -6,7 +6,7 @@ import (
 )
 
 type HttpServer struct {
-	echoEngine *echo.Echo
+	EchoEngine *echo.Echo
 	repository application.RespositoryImpl
 }
 
@@ -15,22 +15,26 @@ func New(
 	repository application.RespositoryImpl,
 ) *HttpServer {
 	return &HttpServer{
-		echoEngine: echoEngine,
+		EchoEngine: echoEngine,
 		repository: repository,
 	}
 }
 
-func (h *HttpServer) StartHttpServer() {
+func (h *HttpServer) SetupRouters() *echo.Echo {
 	httpController := NewController(h.repository)
 
-	h.echoEngine.GET("/live", func(c echo.Context) error {
+	h.EchoEngine.GET("/live", func(c echo.Context) error {
 		return c.JSON(200, "OK")
 	})
 
-	h.echoEngine.POST("/pessoas", httpController.CreatePerson())
-	h.echoEngine.GET("/pessoas/:id", httpController.GetPersonById())
-	h.echoEngine.GET("/pessoas", httpController.SearchPerson())
-	h.echoEngine.GET("/contagem-pessoas", httpController.CountPeople())
+	h.EchoEngine.POST("/pessoas", httpController.CreatePerson())
+	h.EchoEngine.GET("/pessoas/:id", httpController.GetPersonById())
+	h.EchoEngine.GET("/pessoas", httpController.SearchPerson())
+	h.EchoEngine.GET("/contagem-pessoas", httpController.CountPeople())
 
-	h.echoEngine.Logger.Fatal(h.echoEngine.Start(":80"))
+	return h.EchoEngine
+}
+
+func (h *HttpServer) StartServer() {
+	h.EchoEngine.Start(":80")
 }

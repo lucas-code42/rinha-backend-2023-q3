@@ -12,3 +12,9 @@ run-application-tests:
 
 show-application-coverage:
 	go tool cover -html="application-tests.out"
+
+up-tests:
+	cd tests/docker/ && docker compose up
+
+test-race-condition:
+	go run -race cmd/main.go
