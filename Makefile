@@ -18,3 +18,6 @@ up-tests:
 
 test-race-condition:
 	go run -race cmd/main.go
+
+integration-test:
+	cd tests/integration && go test ./...

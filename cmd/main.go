@@ -14,5 +14,7 @@ func main() {
 	repo := repository.New(db.SqlClient)
 	echo := echo.New()
 
-	infra.New(echo, repo).StartHttpServer()
+	srv := infra.New(echo, repo)
+	srv.SetupRouters()
+	srv.StartServer()
 }

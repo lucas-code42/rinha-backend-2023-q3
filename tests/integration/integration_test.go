@@ -17,7 +17,7 @@ import (
 
 func setupServer() *httptest.Server {
 	configs.Init()
-	db := sql.New("test")
+	db := sql.New()
 	repo := repository.New(db.SqlClient)
 	echo := echo.New()
 	srv := infra.New(echo, repo)
