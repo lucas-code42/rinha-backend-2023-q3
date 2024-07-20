@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,11 +12,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/lucas-code42/rinha-backend/infra"
 	"github.com/lucas-code42/rinha-backend/internal/configs"
+	"github.com/lucas-code42/rinha-backend/internal/domain"
 	"github.com/lucas-code42/rinha-backend/internal/repository"
 	"github.com/lucas-code42/rinha-backend/pkg/sql"
 )
 
-func setupServer() *httptest.Server {
+// TODO: better error logs
+// TODO: abstract http resquest...?
+
+var UUID string
+
+func setupTestServer() *httptest.Server {
 	configs.Init()
 	db := sql.New()
 	repo := repository.New(db.SqlClient)
@@ -24,8 +31,8 @@ func setupServer() *httptest.Server {
 	return httptest.NewServer(srv.SetupRouters())
 }
 
-func TestLiveEndpoint(t *testing.T) {
-	ts := setupServer()
+func Test_LiveEndpoint(t *testing.T) {
+	ts := setupTestServer()
 	defer ts.Close()
 
 	r, err := http.Get(fmt.Sprintf("%s/live", ts.URL))
@@ -38,22 +45,24 @@ func TestLiveEndpoint(t *testing.T) {
 	}
 }
 
-func TestCreatePersonEndpoint(t *testing.T) {
-	ts := setupServer()
+func Test_CreatePersonEndpoint(t *testing.T) {
+	ts := setupTestServer()
 	defer ts.Close()
 
-	// TODO: usar fuzztesting
-	payload := strings.NewReader(`{
-		"apelido": "petu",
-		"nome": "yasmin",
-		"stack": [
-			"js"
-		],
-		"nascimento": "2001/01/01"
-	}`)
-
+	// TODO: use fuzztesting
 	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/pessoas", ts.URL), payload)
+	req, err := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf("%s/pessoas", ts.URL),
+		strings.NewReader(`{
+			"apelido": "j",
+			"nome": "Jhon Doe",
+			"stack": [
+				"js"
+			],
+			"nascimento": "2001/10/11"
+		}`),
+	)
 
 	if err != nil {
 		t.Error(err)
@@ -70,8 +79,121 @@ func TestCreatePersonEndpoint(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = io.ReadAll(res.Body)
+	value, ok := res.Header["Location"]
+	if !ok {
+		t.Error(err)
+	}
+	UUID = strings.Replace(value[0], "/pessoas/", "", 1)
+}
+
+func Test_CountPeopleEndpoint(t *testing.T) {
+	ts := setupTestServer()
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("%s/contagem-pessoas", ts.URL),
+		nil,
+	)
 	if err != nil {
 		t.Error(err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		t.Error(err)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	var jsonBody map[string]interface{}
+	if err = json.Unmarshal(body, &jsonBody); err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(jsonBody)
+
+	_, ok := jsonBody["totalRecords"]
+	if !ok {
+		t.Error("could not get 'totalRecords' key")
+	}
+}
+
+func Test_GetPersonIdEndpoint(t *testing.T) {
+	if UUID == "" {
+		t.Error("UIID is empty")
+	}
+
+	ts := setupTestServer()
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("%s/pessoas/%s", ts.URL, UUID),
+		nil,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	var expectedBody domain.Pessoa
+	if err = json.Unmarshal(body, &expectedBody); err != nil {
+		t.Error(err)
+	}
+}
+
+func Test_SearchPersonEndpoint(t *testing.T) {
+	ts := setupTestServer()
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("%s/pessoas?t=js", ts.URL), // simple fake term
+		nil,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	var expectedResponde []domain.Pessoa
+	if err = json.Unmarshal(body, &expectedResponde); err != nil {
+		t.Error(err)
+	}
+
+	if len(expectedResponde) == 0 {
+		t.Error("expected response but got empty result")
 	}
 }
