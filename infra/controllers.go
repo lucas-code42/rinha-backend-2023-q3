@@ -26,7 +26,7 @@ func NewController(respository application.RespositoryImpl) *HttpController {
 	}
 }
 
-func (h *HttpController) CreatePerson() func(echo.Context) error {
+func (h *HttpController) CreatePersonEndpoint() func(echo.Context) error {
 	return func(c echo.Context) error {
 		var payload domain.Pessoa
 		if err := c.Bind(&payload); err != nil {
@@ -54,7 +54,7 @@ func (h *HttpController) CreatePerson() func(echo.Context) error {
 	}
 }
 
-func (h *HttpController) GetPersonById() func(echo.Context) error {
+func (h *HttpController) GetPersonByIdEndpoint() func(echo.Context) error {
 	return func(c echo.Context) error {
 		personId := c.Param("id")
 		if personId == "" {
@@ -74,7 +74,7 @@ func (h *HttpController) GetPersonById() func(echo.Context) error {
 
 }
 
-func (h *HttpController) SearchPerson() func(echo.Context) error {
+func (h *HttpController) SearchPersonEndpoint() func(echo.Context) error {
 	return func(c echo.Context) error {
 		searchTerm := c.QueryParam("t")
 		if searchTerm == "" {
@@ -83,17 +83,17 @@ func (h *HttpController) SearchPerson() func(echo.Context) error {
 		}
 
 		searchPersonUc := searchperson.New(h.respository)
-		pagination, err := searchPersonUc.Execute(searchTerm)
+		results, err := searchPersonUc.Execute(searchTerm)
 		if err != nil {
 			slog.Error("error usecase SearchPerson", err.Error(), err)
 			return c.JSON(http.StatusInternalServerError, map[string]int{"error": http.StatusInternalServerError})
 		}
 
-		return c.JSON(http.StatusOK, pagination)
+		return c.JSON(http.StatusOK, results)
 	}
 }
 
-func (h *HttpController) CountPeople() func(echo.Context) error {
+func (h *HttpController) CountPeopleEndpoint() func(echo.Context) error {
 	return func(c echo.Context) error {
 		countUc := countpeople.New(h.respository)
 		total, err := countUc.Execute()

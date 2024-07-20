@@ -27,10 +27,10 @@ func (h *HttpServer) SetupRouters() *echo.Echo {
 		return c.JSON(200, "OK")
 	})
 
-	h.EchoEngine.POST("/pessoas", httpController.CreatePerson())
-	h.EchoEngine.GET("/pessoas/:id", httpController.GetPersonById())
-	h.EchoEngine.GET("/pessoas", httpController.SearchPerson())
-	h.EchoEngine.GET("/contagem-pessoas", httpController.CountPeople())
+	h.EchoEngine.POST("/pessoas", httpController.CreatePersonEndpoint())
+	h.EchoEngine.GET("/pessoas/:id", httpController.GetPersonByIdEndpoint())
+	h.EchoEngine.GET("/pessoas", httpController.SearchPersonEndpoint())
+	h.EchoEngine.GET("/contagem-pessoas", httpController.CountPeopleEndpoint())
 
 	return h.EchoEngine
 }
